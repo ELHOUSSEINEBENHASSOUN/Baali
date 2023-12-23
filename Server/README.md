@@ -19,7 +19,8 @@ git config user.email
 # Afficher le Log et les details Avec Show
 1/- git log               ==> Afficher infos du personne qui exécuter toutes les commit 
 2/- git show              ==> comme log ms plus les details et pour exit click sur q
-3/- git ls-files          ==> Afficher les files commiter
+3/- git show idcommit     ==> Afficher infos des commits qui va faire un personne
+4/- git ls-files          ==> Afficher les files commiter
 
 # Ignorer des Fichiers et dossiers
 1/- node_modules/         ==> Pour Ignorer des dossiers
@@ -38,12 +39,18 @@ git config user.email
 2/- git reset --hard id   ==> retour a la commit récent
 
 # Lier entre le depot local et distant
-1/- git remote -v         ==> voir le repository distant on liaison avec nous
+1/- git remote -v         ==> voir le repository distant en liaison avec nous
 2/- git remote add origin https://github.com/ELHOUSSEINEBENHASSOUN/Baali.git  ==> lier repository local avec repository distant
+2/- git remote set-url origin https://github.com/ELHOUSSEINEBENHASSOUN/e-com.git  ==> si on change la url
 
 # Envoyer le code vers distant avec push
 1/- git branch -M main    ==> Renames the current Git branch to 'main' while forcefully replacing any existing branch with the same name.
 2/- git remote add origin https://github.com/ELHOUSSEINEBENHASSOUN/Baali.git
 3/- git push -u origin main
 
+# Créer une copie au local avec Clone
+1/- git clone https://github.com/ELHOUSSEINEBENHASSOUN/Baali.git ==> Télécharger le projet
 
+# Fetch (Récupérer les modifications distant sans merge dans votre projet ) et Pull ( Fetch + merge en meme temps )
+1/ git pull  ==> récupérer les mise a jour à faire distant et merger dans local
+dima pull 3ad push 
