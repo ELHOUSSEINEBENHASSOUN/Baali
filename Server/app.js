@@ -27,7 +27,8 @@ app.use(morgan('tiny')); // Status of the requestes HTTP and 'tiny' responsable 
 
 // app.use('/api/v1/account', require('./routes/accountRoute'));
 app.use('/api/v1/notification', require('./routes/notificationRoute'));
-// app.use('/api/v1/transaction', require('./routes/transactionRoute'));
+app.use('/api/v1/transaction', require('./routes/transactionRoute'));
+
 
 
 

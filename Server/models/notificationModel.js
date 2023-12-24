@@ -24,14 +24,8 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-}, { versionKey: false, strict: false });
+}, { versionKey: false});
 
-// notificationSchema.set('toJSON', {
-//     transform: (doc, ret) => {
-//         delete ret._id;
-//         return ret;
-//     }
-// });
 
 // 2- Définition du schéma de validation avec Joi
 const notificationValidationSchema = Joi.object({
