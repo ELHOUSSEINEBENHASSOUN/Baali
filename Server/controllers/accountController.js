@@ -57,6 +57,22 @@ const deleteAccountById = async (req, res) => {
     }
 };
 
+// supprimer toutes accounts 
+const deleteAllAccounts = async (req, res) => {
+    try {
+        const result = await Account.deleteMany({});
+
+        // Check if any documents were deleted
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'No accounts found to delete' });
+        }
+
+        res.status(200).json({ message: 'All accounts deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // update un account 
 const updateAccountById = async (req, res) => {
     const { id } = req.params;
@@ -78,10 +94,13 @@ const updateAccountById = async (req, res) => {
     }
 };
 
+
+
 module.exports = {
     createAccount,
     getAllAccounts,
     getAccountById,
     deleteAccountById,
+    deleteAllAccounts,
     updateAccountById
 };
