@@ -1,5 +1,5 @@
 const express = require('express');
-const morgan= require('morgan');
+const morgan = require('morgan');
 const joi = require('joi');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
@@ -8,7 +8,7 @@ require('./config/database');
 
 
 
-dotenv.config({path: '.env'});
+dotenv.config({ path: '.env' });
 
 
 
@@ -26,6 +26,7 @@ app.use(morgan('tiny')); // Status of the requestes HTTP and 'tiny' responsable 
 // app.use('/api/v1/account', accountRoute)+const accountRoute = require('./routes/accountRoute');
 
 // app.use('/api/v1/account', require('./routes/accountRoute'));
+app.use('/api/v1/account', require('./routes/accountRoute'));
 app.use('/api/v1/notification', require('./routes/notificationRoute'));
 // app.use('/api/v1/transaction', require('./routes/transactionRoute'));
 
