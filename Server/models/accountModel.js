@@ -3,98 +3,29 @@ const crypto = require('crypto');
 
 const AccountSchema = new mongoose.Schema({
 
-    _id: {
-        type: String,
-        default: () => crypto.randomUUID(),
-    },
+    // _id: { type: String, default: () => crypto.randomUUID() },
 
+    fullname: { type: String, required: true, trim: true },
 
-    fullname: {
-        type: String,
-        required: true
-    },
+    email: { type: String, required: true, unique: true, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
 
+    password: { type: String, required: true },
 
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function (value) {
-                // Use a regular expression for basic email validation
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-            },
-            message: 'Invalid email address'
-        }
-    },
+    phoneNumber: { type: String, required: true, unique: true, trim: true },
 
+    address: { type: Array, required: true },
 
-    password: {
-        type: String,
-        required: true
-    },
+    isAdmin: { type: Boolean, required: true },
 
-    phoneNumber: {
-        type: String,
-        required: true
-    },
+    createdAt: { type: Date, default: Date.now },
 
+    lastLogin: { type: Date, default: null },
 
-    //address: { type: Array, required: false },
-    address: [{
-        street: {
-            type: String,
-            required: true
-        },
-        city: {
-            type: String,
-            required: true
-        },
-        state: {
-            type: String,
-            required: true
-        },
-        postalCode: {
-            type: String,
-            required: true
-        }
-    }],
+    wishlist: { type: Array, required: false },
 
+    resetPasswordToken: { type: String, required: false },
 
-    isAdmin: {
-        type: Boolean,
-        required: true
-    },
-
-
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-
-
-    lastLogin: {
-        type: Date,
-        default: null
-    },
-
-
-    wishlist: {
-        type: Array,
-        required: false
-    },
-
-
-    resetPasswordToken: {
-        type: String,
-        required: false
-    },
-
-
-    resetPasswordExpires: {
-        type: Date,
-        required: false
-    }
+    resetPasswordExpires: { type: Date, required: false }
 
 })
 

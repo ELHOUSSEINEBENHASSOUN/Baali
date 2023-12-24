@@ -3,154 +3,61 @@ const crypto = require('crypto');
 
 const productSchema = new mongoose.Schema({
 
-    _id: {
-        type: String,
-        default: () => crypto.randomUUID(),
-    },
+    // _id: { type: String, default: () => crypto.randomUUID() },
 
+    title: { type: String, required: true, trim: true },
 
-    title: {
-        type: String,
-        required: true
-    },
+    description: { type: String, required: true, trim: true },
 
+    thumbnail: { type: String, required: true },
 
-    description: {
-        type: String,
-        required: true
-    },
+    images: { type: Array, required: true },
 
+    price: { type: Number, required: function () { return this.status } },
 
-    thumbnail: {
-        type: String,
-        required: true
-    },
+    compareAtPrice: { type: Number, required: false },
 
+    SKU: { type: String, required: true, unique: true, trim: true },
 
-    images: {
-        type: [String], // Array of image URLs
-        required: true
-    },
-
-
-    price: {
-        type: Number,
-        required: true
-    },
-
-
-    compareAtPrice: {
-        type: Number
-    },
-
-
-    SKU: {
-        type: String,
-        required: true
-    },
-
-
-    // Structure of each variant
-    // Example: { color: String, size: String, price: Number, stockQty: Number }
     variants: {
         type: [{
-            color: {
-                type: String,
-                required: true
-            },
-            size: {
-                type: String,
-                required: true
-            },
-            price: {
-                type: Number,
-                required: true
-            },
-            stockQty: {
-                type: Number,
-                required: true
-            },
+            color: { type: String, required: false, trim: true },
+            size: { type: String, required: false, trim: true },
+            price: { type: Number, required: false, trim: true },
+            stockQty: { type: Number, required: false, trim: true },
         }],
-        required: true
+        required: false
     },
 
+    stockQty: { type: Number, required: true },
 
-    stockQty: {
-        type: Number,
-        required: true
-    },
-
-    // Structure of each review
-    // Example: { rating: Number, comment: String, createdBy: String }
     reviews: {
         type: [{
-
-            rating: {
-                type: Number,
-                required: true
-            },
-            comment: {
-                type: String,
-                required: true
-            },
-            createdBy: {
-                type: String,
-                required: true
-            },
+            rating: { type: Number, required: true },
+            comment: { type: String, required: true, trim: true },
+            createdBy: { type: String, required: true, trim: true },
 
         }],
         required: true
     },
 
+    category: { type: String, required: true, trim: true },
 
-    category: {
-        type: String,
-        required: true
-    },
+    status: { type: String, required: true, trim: true },
 
+    tags: { type: Array, required: true },
 
-    status: {
-        type: String,
-        enum: ['active', 'inactive'], // Example enum for status
-        required: true
-    },
+    createdBy: { type: String, required: true, trim: true },
 
+    averageRating: { type: Number, required: true },
 
-    tags: {
-        type: [String], // Array of tags
-        required: true
-    },
+    isFeatured: { type: Boolean, required: false },
 
-    createdBy: {
-        type: String,
-        required: true
-    },
+    metaTitle: { type: String, required: false, trim: true },
 
+    metaDescription: { type: String, required: false, trim: true },
 
-    averageRating: {
-        type: Number
-    },
-
-
-    isFeatured: {
-        type: Boolean,
-        required: true
-    },
-
-
-    metaTitle: {
-        type: String
-    },
-
-
-    metaDescription: {
-        type: String
-    },
-
-
-    metaKeywords: {
-        type: String
-    }
+    metaKeywords: { type: String, required: false, trim: true }
 
 });
 
