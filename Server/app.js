@@ -1,6 +1,5 @@
 const express = require('express');
 const morgan= require('morgan');
-const joi = require('joi');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 require('./config/database');

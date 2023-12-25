@@ -6,19 +6,23 @@ const notificationSchema = new mongoose.Schema({
     
     accountId: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     type: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     message: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     createdAt: {
         type: Date,

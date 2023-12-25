@@ -6,15 +6,18 @@ const Joi = require('joi');
 const transactionSchema = new mongoose.Schema({
     orderId: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     accountId: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     amount: {
         type: Number,
-        required: true
+        required: true,
+        trim: true
     },
     transactionDate: {
         type: Date,
@@ -22,11 +25,13 @@ const transactionSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     status: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     }
 }, { versionKey: false});
 
