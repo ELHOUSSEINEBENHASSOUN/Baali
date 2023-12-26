@@ -4,35 +4,12 @@ const Joi = require('joi');
 // Définition de schéma
 
 const transactionSchema = new mongoose.Schema({
-    orderId: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    accountId: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    amount: {
-        type: Number,
-        required: true,
-        trim: true
-    },
-    transactionDate: {
-        type: Date,
-        default: Date.now
-    },
-    paymentMethod: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    status: {
-        type: String,
-        required: true,
-        trim: true
-    }
+    orderId: { type: String, required: true, trim: true},
+    accountId: { type: String, required: true, trim: true},
+    amount: { type: Number, required: true, trim: true},
+    transactionDate: { type: Date, default: Date.now},
+    paymentMethod: { type: String, required: true, trim: true},
+    status: {type: String, required: true, trim: true}
 }, { versionKey: false});
 
 // schéma de validation 
