@@ -7,11 +7,11 @@ const auth = require('../middleware/authMiddleware');
 //routes
 router.post('/addAcc', createAccount);
 router.get('/getAllAcc',auth, getAllAccounts);
-router.get('/getAcc/:id', getAccountById);
+router.get('/getAcc/:id',auth, getAccountById);
 
-router.delete('/delAcc/:id', deleteAccountById);
-router.delete('/delAllAcc', deleteAllAccounts);
+router.delete('/delAcc/:id',auth, deleteAccountById);
+router.delete('/delAllAcc', auth, deleteAllAccounts);
 
-router.put('/updateAcc/:id', updateAccountById);
+router.put('/updateAcc/:id',auth, updateAccountById);
 
 module.exports = router;
