@@ -1,4 +1,5 @@
 const { Account, accountValidationSchema } = require('../models/accountModel');
+const bcrypt = require('bcrypt');
 
 
 // recupere toutes les accounts
@@ -18,8 +19,16 @@ const createAccount = async (req, res) => {
         const { error } = accountValidationSchema.validate(req.body);
 
         if (error) return res.status(400).json({ error: error.details[0].message });
+        
+        // Hash the password
+         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
         // Save the account
-        const account = new Account(req.body);
+        //const account = new Account(req.body);
+        const account = new Account({
+            ...req.body,
+            password: hashedPassword,
+        });
         await account.save();
 
         res.status(201).send(account);

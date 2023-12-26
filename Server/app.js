@@ -30,6 +30,7 @@ app.use('/api/v1/account', require('./routes/accountRoute'));
 app.use('/api/v1/category', require('./routes/categoryRoute'));
 app.use('/api/v1/offer', require('./routes/offerRoute'));
 app.use('/api/v1/notification', require('./routes/notificationRoute'));
+app.use('/api/v1/auth', require('./routes/AuthRoute'));
 // app.use('/api/v1/transaction', require('./routes/transactionRoute'));
 
 
