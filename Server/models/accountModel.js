@@ -31,6 +31,8 @@ const AccountSchema = new mongoose.Schema({
 
     confirmationToken : {type: String},
 
+    confirmed : {type:Boolean , default: false},
+
     resetPasswordExpires: { type: Date, default: null }
 
 }, { versionKey: false });

@@ -19,14 +19,16 @@ const jwt = require('jsonwebtoken');
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
+    //host: 'smtp.gmail.com',
     auth: {
        
-        type: "OAuth2",
-        user: "mnrbaali@gmailcom",
-        clientId: '695313908186-5dalohai3j8ij6atbqgbkuo6as6n67u3.apps.googleusercontent.com',
-        clientSecret: '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'
+        //type: "OAuth2",
+        user: "mnrbaali@gmail.com",
+        pass: "oxnxehselbsmwabu",
+       /* clientId: '695313908186-5dalohai3j8ij6atbqgbkuo6as6n67u3.apps.googleusercontent.com',
+        clientSecret: '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',
         /*refreshToken: 'votreRefreshToken'*/
+        /*accessToken:"AIzaSyBIsgFMUnpCie7D3hROXuEQNdGRb4jZE4s"*/
     }
 
 });
@@ -68,7 +70,7 @@ exports.register = async (req, res) => {
         await account.save();
 
         // Créer le lien de confirmation
-        let confirmationLink = `http://localhost:3000/api/v1/auth/confirm/${token}`;
+        let confirmationLink = `http://localhost:3000/api/v1/auth/register/${token}`;
 
         // Créer le message de confirmation
         let mailOptions = {
