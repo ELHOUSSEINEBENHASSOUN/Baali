@@ -29,6 +29,8 @@ const AccountSchema = new mongoose.Schema({
 
     resetPasswordToken: { type: String, default: null },
 
+    confirmationToken : {type: String},
+
     resetPasswordExpires: { type: Date, default: null }
 
 }, { versionKey: false });
