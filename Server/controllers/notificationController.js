@@ -19,10 +19,37 @@ const createNotification = async (req, res) => {
 
 // recupere ttes les notifs
 
+// const getAllNotifications = async (req, res) => {
+//     try {
+//         //pagination
+//         //validation des parametresde pagination
+//         //limit= pageSize
+//         const pageSize = parseInt(req.query.pagesize) || 3;
+//         if (pageSize <= 0) {
+//         return res.status(400).json({error: 'Invalid page size'});
+//     }
+//         const currentPage = parseInt(req.query.page) || 2;
+//         if (currentPage <= 0) {
+//         return res.status(400).json({error: 'Invalid page number'});
+//     }
+//     // application de la pagination
+//         const skipNumber = (currentPage - 1) * pageSize;
+//         const notifications = await Notification.find({}).skip(skipNumber).limit(pageSize);
+//         res.status(200).json({ results: notifications.length,
+//             //currentPage,=
+//             pages: Math.ceil(await Notification.countDocuments() / pageSize),
+//             data: notifications
+//         });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 const getAllNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find();
-        res.status(200).send(notifications);
+        const notifications = await Notification.find({});
+        res.status(200).json({ results: notifications.length,
+            data: notifications
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
