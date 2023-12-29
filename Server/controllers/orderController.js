@@ -1,73 +1,95 @@
-//Create
-const Order = require('./models/orderModel');
+const { Order, orderValidationSchema } = require('../models/orderModel');
 
-async function createOrder(orderData) {
-  try {
-    const newOrder = await Order.create(orderData);
-    console.log('Order created successfully:', newOrder);
-    return newOrder;
-  } catch (error) {
-    console.error('Error creating order:', error.message);
-    throw error;
-  }
-}
+// CREATE
+const createOrder = async (req, res) => {
+    try {
+        // Validate the data
+        const { error } = orderValidationSchema.validate(req.body);
 
-//Read
-async function getAllOrders() {
-    try {
-      const allOrders = await Order.find();
-      console.log('All orders retrieved successfully:', allOrders);
-      return allOrders;
+        if (error) return res.status(400).json({ error: error.details[0].message });
+
+        // Save the order
+        const order = new Order(req.body);
+        await order.save();
+
+        res.status(201).send(order);
     } catch (error) {
-      console.error('Error retrieving orders:', error.message);
-      throw error;
+        res.status(500).json({ error: error.message });
     }
-  }
-  
-  async function getOrderById(orderId) {
+};
+
+// READ
+const getOrderById = async (req, res) => {
+    const { id } = req.params;
     try {
-      const order = await Order.findById(orderId);
-      if (!order) {
-        console.log('Order not found');
-        return null;
-      }
-      console.log('Order retrieved successfully:', order);
-      return order;
+        const order = await Order.findById(id);
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        res.status(200).send(order);
     } catch (error) {
-      console.error('Error retrieving order:', error.message);
-      throw error;
+        res.status(500).json({ error: error.message });
     }
-  }
-  
-//Update
-async function updateOrder(orderId, updatedOrderData) {
+};
+
+const getAllOrders = async (req, res) => {
     try {
-      const updatedOrder = await Order.findByIdAndUpdate(orderId, updatedOrderData, { new: true });
-      if (!updatedOrder) {
-        console.log('Order not found');
-        return null;
-      }
-      console.log('Order updated successfully:', updatedOrder);
-      return updatedOrder;
+        const orders = await Order.find();
+        res.status(200).send(orders);
     } catch (error) {
-      console.error('Error updating order:', error.message);
-      throw error;
+        res.status(500).json({ error: error.message });
     }
-  }
-  
-//Delete
-async function deleteOrder(orderId) {
+};
+
+// UPDATE
+const updateOrderById = async (req, res) => {
+    const { id } = req.params;
     try {
-      const deletedOrder = await Order.findByIdAndRemove(orderId);
-      if (!deletedOrder) {
-        console.log('Order not found');
-        return null;
-      }
-      console.log('Order deleted successfully:', deletedOrder);
-      return deletedOrder;
+        const updatedOrder = await Order.findByIdAndUpdate(id, req.body, { new: true });
+        if (!updatedOrder) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        res.status(200).send(updatedOrder);
     } catch (error) {
-      console.error('Error deleting order:', error.message);
-      throw error;
+        res.status(500).json({ error: error.message });
     }
-  }
-  
+};
+
+// DELETE
+const deleteOrderById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedOrder = await Order.findByIdAndDelete(id);
+        if (!deletedOrder) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+        res.status(200).send(deletedOrder);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const deleteAllOrders = async (req, res) => {
+    try {
+        const result = await Order.deleteMany({});
+
+        // Check if any documents were deleted
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'No orders found to delete' });
+        }
+
+        res.status(200).json({ message: 'All orders deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = {
+    createOrder,
+    getAllOrders,
+    getOrderById,
+    deleteOrderById,
+    deleteAllOrders,
+    updateOrderById
+};

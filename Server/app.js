@@ -23,13 +23,13 @@ app.use(morgan('tiny')); // Status of the requestes HTTP and 'tiny' responsable 
 
 
 //Routes
-app.use('/api/v1/account', require('./routes/accountRoute'));
-app.use('/api/v1/category', require('./routes/categoryRoute'));
-app.use('/api/v1/offer', require('./routes/offerRoute'));
-app.use('/api/v1/notification', require('./routes/notificationRoute'));
-app.use('/api/v1/transaction', require('./routes/transactionRoute'));
+// app.use('/api/v1/account', require('./routes/accountRoute'));
+// app.use('/api/v1/category', require('./routes/categoryRoute'));
+// app.use('/api/v1/offer', require('./routes/offerRoute'));
+// app.use('/api/v1/notification', require('./routes/notificationRoute'));
+// app.use('/api/v1/transaction', require('./routes/transactionRoute'));
 app.use('/api/v1/shipping', require('./routes/shippingRoute'));
-
+app.use('/api/v1/order', require('./routes/orderRoute'))
 
 
 
