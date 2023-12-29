@@ -147,15 +147,16 @@ exports.register = async (req, res) => {
             confirmationToken: token
         };
 
-        // Stocker l'objet compte dans la session
-        req.session.user = account;
-
+        // Stocker le token de confirmation dans la session
+        req.session.account = account;
+        req.session.confirmationToken = token;
+         console.log(req.session.confirmationToken);
         // Envoyer l'e-mail de confirmation
         await sendMail(account, res);
     } catch (error) {
+        // Supprimer le token de confirmation de la session en cas d'erreur
+        delete req.session.confirmationToken;
 
-         // Supprimer le compte de la session en cas d'erreur
-         //delete req.session.account;
         res.status(500).json({ error: error.message });
     }
 };
