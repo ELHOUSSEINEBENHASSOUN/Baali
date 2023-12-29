@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { createAccount, getAllAccounts, getAccountById, deleteAccountById, deleteAllAccounts, updateAccountById } = require('../controllers/accountController');
 const { accountValidator } = require('../middleware/accountMiddleware');
+const { authenticate, isAdmin, isManager } = require('../middleware/authMiddleware');
 
 //routes
 router.post('/addAcc', accountValidator, createAccount);

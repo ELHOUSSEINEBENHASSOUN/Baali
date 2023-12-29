@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { productSchema } = require('../models/accountModel');
+const { productSchema } = require('../models/productModel');
 
 // 1- Définition du schéma
 const AccountSchema = new mongoose.Schema({
@@ -14,13 +14,13 @@ const AccountSchema = new mongoose.Schema({
 
     phoneNumber: { type: String, trim: true },
 
-    address: { type: [String], default: [] },
+    address: { type: Array, default: [] },
 
     isAdmin: { type: Boolean, required: true, default: false },
 
     lastLogin: { type: Date, default: null },
 
-    wishlist: { type: [productSchema], default: [] },
+    wishlist: { type: Array, default: [] },
 
     resetPasswordToken: { type: String },
 

@@ -11,4 +11,22 @@ const authenticate = (req, res, next) => {
     }
 };
 
-module.exports = authenticate;
+const isAdmin = (req, res, next) => {
+    if (req.account && req.account.role === 'Admin') {
+        return next();
+    }
+    return res.status(403).json({ message: 'Access denied: Admin privileges required.' });
+};
+
+const isManager = (req, res, next) => {
+    if (req.account && req.account.role === 'Manager') {
+        return next();
+    }
+    return res.status(403).json({ message: 'Access denied: Manger privileges required.' });
+};
+
+module.exports = {
+    authenticate,
+    isAdmin,
+    isManager
+};
