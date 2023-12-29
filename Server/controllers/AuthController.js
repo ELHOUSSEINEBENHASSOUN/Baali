@@ -2,8 +2,10 @@ const { Account, accountValidationSchema } = require('../models/accountModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+var session = require('express-session')
 
 const jwt = require('jsonwebtoken');
+const { count } = require('console');
 
 
 
@@ -48,7 +50,7 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.register = async (req, res) => {
+/*exports.register = async (req, res) => {
     try {
         // Validate the data
         const { error } = accountValidationSchema.validate(req.body);
@@ -93,7 +95,7 @@ exports.register = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};
+};*/
 
 
 exports.logout = (req, res) => {
@@ -103,3 +105,61 @@ exports.logout = (req, res) => {
     // Envoyer une réponse au client pour confirmer la déconnexion
     res.status(200).send('Déconnecté avec succès');
 }; 
+
+// Fonction d'envoi de mail
+async function sendMail(account, res) {
+    let mailOptions = {
+        from: 'mnrbaali@gmail.com',
+        to: account.email,
+        subject: 'Confirmation d\'inscription',
+        text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
+    };
+
+    // Envoyer l'e-mail de confirmation
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+            res.status(500).send('Une erreur s\'est produite lors de l\'envoi de l\'e-mail de confirmation');
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.status(201).send('Un e-mail de confirmation a été envoyé à ' + account.email);
+        }
+    });
+}
+
+// Fonction d'enregistrement
+exports.register = async (req, res) => {
+    try {
+        // Validate the data
+        const { error } = accountValidationSchema.validate(req.body);
+        if (error) return res.status(400).json({ error: error.details[0].message });
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        // Générer un jeton unique pour l'utilisateur
+        let token = crypto.randomBytes(64).toString('hex');
+
+        // Créer l'objet compte
+        const account = {
+            ...req.body,
+            password: hashedPassword,
+            confirmationToken: token
+        };
+
+        // Stocker l'objet compte dans la session
+        req.session.user = account;
+
+        // Envoyer l'e-mail de confirmation
+        await sendMail(account, res);
+    } catch (error) {
+
+         // Supprimer le compte de la session en cas d'erreur
+         //delete req.session.account;
+        res.status(500).json({ error: error.message });
+    }
+};
+
+/*module.exports = {
+    sendMail,
+};*/
