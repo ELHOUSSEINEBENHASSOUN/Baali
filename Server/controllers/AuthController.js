@@ -107,7 +107,7 @@ exports.logout = (req, res) => {
 }; 
 
 // Fonction d'envoi de mail
-async function sendMail(account, res) {
+exports.sendMail = async (account, res) =>{
     let mailOptions = {
         from: 'mnrbaali@gmail.com',
         to: account.email,
@@ -146,13 +146,13 @@ exports.register = async (req, res) => {
             password: hashedPassword,
             confirmationToken: token
         };
-
+        const utilisateur = jwt.sign(account, 'JWT_SECRETt');
         // Stocker le token de confirmation dans la session
-        req.session.account = account;
+        req.session.account = utilisateur;
         req.session.confirmationToken = token;
          console.log(req.session.confirmationToken);
         // Envoyer l'e-mail de confirmation
-        await sendMail(account, res);
+        await exports.sendMail(account, res);
     } catch (error) {
         // Supprimer le token de confirmation de la session en cas d'erreur
         delete req.session.confirmationToken;
@@ -162,5 +162,5 @@ exports.register = async (req, res) => {
 };
 
 /*module.exports = {
-    sendMail,
+    sendMail: sendMail
 };*/
