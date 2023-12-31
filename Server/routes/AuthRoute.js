@@ -45,7 +45,7 @@ router.post('/logout',authController.logout);
 });*/
 
 // Route de confirmation
-router.get('/register/:token', async (req, res) => {
+router.get('/register/:token', async (req, res, next) => {
     try {
         // Vérifier si le token correspond à celui dans la session
         //console.log(req.params.token);
@@ -65,15 +65,21 @@ router.get('/register/:token', async (req, res) => {
             return res.send('Votre adresse e-mail a été confirmée avec succès');
         }
 
+        throw new Error('Le lien de confirmation est invalide');
+    } catch (error) {
+        next(error); // Passez l'erreur au prochain middleware
+    }
+});
+/*
         return res.status(400).send('Le lien de confirmation est invalide');
     } catch (error) {
         res.status(500).send('Une erreur s\'est produite lors de la confirmation de votre adresse e-mail : ' + error.message);
     }
-});
+});*/
 
 
 // Ajoutez cette route dans votre fichier authRoute
-router.get('/resend-confirmation', async (req, res) => {
+router.get('/resend-confirmation', async (req, res, next) => {
     try {
         // Vérifiez si le compte existe dans la session
         if (req.session && req.session.account) {
@@ -81,13 +87,21 @@ router.get('/resend-confirmation', async (req, res) => {
             const accountModel = jwt.verify(req.session.account, 'JWT_SECRETt');
             // Renvoyer l'e-mail de confirmation
             await authController.sendMail(accountModel, res);
-        } else {
+        } else  {
+            throw new Error('Aucun compte trouvé dans la session');
+        }
+    } catch (error) {
+        next(error); // Passez l'erreur au prochain middleware
+    }
+});/*{
+
+            
             return res.status(400).send('Aucun compte trouvé dans la session');
         }
     } catch (error) {
         res.status(500).send('Une erreur s\'est produite lors de la réexpédition de l\'e-mail de confirmation : ' + error.message);
     }
-});
+});*/
 
 module.exports = router;
 /*module.exports = router;*/

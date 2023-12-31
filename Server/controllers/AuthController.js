@@ -35,7 +35,27 @@ let transporter = nodemailer.createTransport({
 
 });
 
-exports.login = async (req, res) => {
+//fonction login
+exports.login = async (req, res, next) => {
+    try {
+        const user = await Account.findOne({ email: req.body.email});
+        if (user && await bcrypt.compare(req.body.password, user.password)) {
+            // Utilisateur authentifié avec succès
+            // Générer un token JWT et l'envoyer à l'utilisateur
+
+            const token = jwt.sign({ id: user._id }, 'JWT_SECRET', { expiresIn: '1h' });
+
+            // Envoyer le token à l'utilisateur
+            res.status(200).json({ token: token });
+        } else {
+            throw new Error('Erreur d\'authentification');
+        }
+    } catch (error) {
+        next(error); // Passez l'erreur au prochain middleware
+    }
+};
+
+/*exports.login = async (req, res) => {
     const user = await Account.findOne({ email: req.body.email});
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         // Utilisateur authentifié avec succès
@@ -49,7 +69,7 @@ exports.login = async (req, res) => {
         res.status(401).send('Nom d\'utilisateur ou mot de passe incorrect');
     }
 };
-
+*/
 /*exports.register = async (req, res) => {
     try {
         // Validate the data
@@ -107,7 +127,31 @@ exports.logout = (req, res) => {
 }; 
 
 // Fonction d'envoi de mail
-exports.sendMail = async (account, res) =>{
+
+exports.sendMail = async (account, res, next) => {
+    try {
+        let mailOptions = {
+            from: 'mnrbaali@gmail.com',
+            to: account.email,
+            subject: 'Confirmation d\'inscription',
+            text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
+        };
+
+        // Envoyer l'e-mail de confirmation
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                throw new Error('Erreur d\'envoi de mail');
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.status(201).send('Un e-mail de confirmation a été envoyé à ' + account.email);
+            }
+        });
+    } catch (error) {
+        next(error); // Passez l'erreur au prochain middleware
+    }
+};
+
+/*exports.sendMail = async (account, res) =>{
     let mailOptions = {
         from: 'mnrbaali@gmail.com',
         to: account.email,
@@ -126,9 +170,9 @@ exports.sendMail = async (account, res) =>{
         }
     });
 }
-
+*/
 // Fonction d'enregistrement
-exports.register = async (req, res) => {
+exports.register = async (req, res , next) => {
     try {
         // Validate the data
         const { error } = accountValidationSchema.validate(req.body);
@@ -156,8 +200,8 @@ exports.register = async (req, res) => {
     } catch (error) {
         // Supprimer le token de confirmation de la session en cas d'erreur
         delete req.session.confirmationToken;
-
-        res.status(500).json({ error: error.message });
+        next(error); // Passez l'erreur au prochain middleware
+        //res.status(500).json({ error: error.message });
     }
 };
 
