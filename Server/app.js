@@ -60,6 +60,21 @@ app.use((err, req, res, next) => {
       case 'Aucun compte trouvé dans la session':
             res.status(400).send('Aucun compte trouvé dans la session');
             break;    
+      case 'Aucun compte trouvé avec cet e-mail':
+            res.status(400).send('Aucun compte trouvé merci de verifier votre adrese mail et ressyez à nouveau');
+            break;
+            case 'Token de réinitialisation du mot de passe invalide':
+            res.status(400).send('Token de réinitialisation du mot de passe invalide');
+            break;      
+      case 'Token de réinitialisation du mot de passe expiré':
+            res.status(400).send('Token de réinitialisation du mot de passe expiré');
+            break;      
+      case 'Aucun nouveau mot de passe fourni':
+            res.status(400).send('Aucun nouveau mot de passe fourni');
+            break;      
+      /*case 'Aucun compte trouvé avec cet e-mail':
+            res.status(400).send('Aucun compte trouvé merci de verifier votre adrese mail et ressyez à nouveau');
+            break;                     */
       default:
           res.status(500).send('Une erreur inconnue s\'est produite');
   }

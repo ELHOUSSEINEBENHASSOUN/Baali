@@ -128,8 +128,78 @@ exports.logout = (req, res) => {
 
 // Fonction d'envoi de mail
 
-exports.sendMail = async (account, res, next) => {
+exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res, next) => {
+   
     try {
+        let mailOptions;
+
+        switch (type) {
+            case 'confirmation':
+                mailOptions = {
+                    from: 'mnrbaali@gmail.com',
+                    to: account.email,
+                    subject: 'Confirmation d\'inscription',
+                    text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
+                };
+                break;
+
+                case 'reset-password':
+                    mailOptions = {
+                        from: 'mnrbaali@gmail.com',
+                        to: account.email,
+                        subject: 'Réinitialisation du mot de passe',
+                        text: `Vous recevez ceci parce que vous (ou quelqu'un d'autre) avez demandé la réinitialisation du mot de passe de votre compte.\n\n` +
+                              `Veuillez cliquer sur le lien suivant, ou copiez et collez-le dans votre navigateur pour terminer le processus :\n\n` +
+                              `http://localhost:3000/reset/${token}\n\n` +
+                              `Ce lien expirera à ${new Date(resetconfirmationTokenExpires).toLocaleString()}.\n\n` +
+                              `Si vous n'avez pas demandé cela, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.\n`
+                    };
+                    break;
+            /*case 'reset-password':
+                mailOptions = {
+                    from: 'mnrbaali@gmail.com',
+                    to: account.email,
+                    subject: 'Réinitialisation du mot de passe',
+                    text: `Vous recevez ceci parce que vous (ou quelqu'un d'autre) avez demandé la réinitialisation du mot de passe de votre compte.\n\n` +
+                          `Veuillez cliquer sur le lien suivant, ou copiez et collez-le dans votre navigateur pour terminer le processus :\n\n` +
+                          `http://localhost:3000/reset/${account.confirmationToken}\n\n` +
+                          `Si vous n'avez pas demandé cela, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.\n`
+                };
+                break;*/
+            // Ajoutez autant de cas que vous le souhaitez...
+        }
+
+        // Envoyer l'e-mail
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                throw new Error('Erreur d\'envoi de mail');
+            } else {
+                console.log('Email sent: ' + info.response);
+                res.status(201).send('Un e-mail a été envoyé à ' + account.email);
+            }
+        });
+    } catch (error) {
+        next(error); // Passez l'erreur au prochain middleware
+    }
+};
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+    /* try {
         let mailOptions = {
             from: 'mnrbaali@gmail.com',
             to: account.email,
@@ -149,7 +219,7 @@ exports.sendMail = async (account, res, next) => {
     } catch (error) {
         next(error); // Passez l'erreur au prochain middleware
     }
-};
+};*/
 
 /*exports.sendMail = async (account, res) =>{
     let mailOptions = {
@@ -171,6 +241,15 @@ exports.sendMail = async (account, res, next) => {
     });
 }
 */
+
+
+
+
+
+
+
+
+
 // Fonction d'enregistrement
 exports.register = async (req, res , next) => {
     try {
@@ -183,12 +262,13 @@ exports.register = async (req, res , next) => {
 
         // Générer un jeton unique pour l'utilisateur
         let token = crypto.randomBytes(64).toString('hex');
-
+        let resetconfirmationTokenExpires = Date.now() + 3600000; // 1 heure
         // Créer l'objet compte
         const account = {
             ...req.body,
             password: hashedPassword,
-            confirmationToken: token
+            confirmationToken: token,
+            resetPasswordExpires :resetconfirmationTokenExpires
         };
         const utilisateur = jwt.sign(account, 'JWT_SECRETt');
         // Stocker le token de confirmation dans la session
@@ -196,13 +276,23 @@ exports.register = async (req, res , next) => {
         req.session.confirmationToken = token;
          console.log(req.session.confirmationToken);
         // Envoyer l'e-mail de confirmation
-        await exports.sendMail(account, res);
+        await exports.sendMail(account,'confirmation', res);
     } catch (error) {
         // Supprimer le token de confirmation de la session en cas d'erreur
         delete req.session.confirmationToken;
         next(error); // Passez l'erreur au prochain middleware
         //res.status(500).json({ error: error.message });
     }
+};
+
+
+// Votre fonction CRUD pour réinitialiser le mot de passe
+exports.resetPassword = async (userId, newPassword) => {
+    // Hash le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Mettez à jour le mot de passe de l'utilisateur et supprimez le token de réinitialisation du mot de passe
+    await Account.updateOne({ _id: userId }, { password: hashedPassword, resetPasswordToken: undefined, resetPasswordExpires: undefined });
 };
 
 /*module.exports = {
