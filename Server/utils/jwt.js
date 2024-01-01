@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
@@ -18,7 +19,10 @@ const verifyToken = token => {
     try{
     return jwt.verify(token, secretKey);
     }catch(error) {
-        throw new Error('Error verifying token')
+        if (error.name === 'TokenExpiredError') {
+        throw new Error('Token expired')
+        } else {
+        throw new Error('Error verifying token')}
     }
 };
 
