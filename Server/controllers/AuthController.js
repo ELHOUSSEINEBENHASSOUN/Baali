@@ -9,15 +9,6 @@ const { count } = require('console');
 
 
 
-// Créer un transporteur de messagerie
-/*let transporter = nodemailer.createTransport({
-    service: 'smtp.yandex.ru',
-    host: 'smtp.yandex.ru',
-    auth: {
-        user: 'mounir.baali@ya.ru',
-        pass: 'shademan199206'
-    }
-});*/
 
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -72,6 +63,9 @@ const register = async (req, res , next) => {
         const account = {
             ...req.body,
             password: hashedPassword,
+            //cette ligne est ajouté pour imposé au programme de mettre isadmin sur false à fin d'eviter une modification par un utilisateur malatttentioné
+            isAdmin: false,
+            confirmed : true ,
             confirmationToken: token,
             resetPasswordExpires :resetconfirmationTokenExpires
         };
@@ -101,67 +95,7 @@ const resetPassword = async (userId, newPassword) => {
     await Account.updateOne({ _id: userId }, { password: hashedPassword, resetPasswordToken: undefined, resetPasswordExpires: undefined });
 };
 
-/*const login = async (req, res) => {
-    const user = await Account.findOne({ email: req.body.email});
-    if (user && await bcrypt.compare(req.body.password, user.password)) {
-        // Utilisateur authentifié avec succès
-        // Générer un token JWT et l'envoyer à l'utilisateur
 
-        const token = jwt.sign({ id: user._id }, 'JWT_SECRET', { expiresIn: '1h' });
-
-        // Envoyer le token à l'utilisateur
-        res.status(200).json({ token: token });
-    } else {
-        res.status(401).send('Nom d\'utilisateur ou mot de passe incorrect');
-    }
-};
-*/
-/*const register = async (req, res) => {
-    try {
-        // Validate the data
-        const { error } = accountValidationSchema.validate(req.body);
-
-        if (error) return res.status(400).json({ error: error.details[0].message });
-        
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-        // Générer un jeton unique pour l'utilisateur
-        let token = crypto.randomBytes(64).toString('hex');
-
-        // Save the account
-        const account = new Account({
-            ...req.body,
-            password: hashedPassword,
-            confirmationToken: token
-        });
-        await account.save();
-
-        // Créer le lien de confirmation
-        let confirmationLink = `http://localhost:3000/api/v1/auth/register/${token}`;
-
-        // Créer le message de confirmation
-        let mailOptions = {
-            from: 'mnrbaali@gmail.com',
-            to: req.body.email,
-            subject: 'Confirmation d\'inscription',
-            text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : ${confirmationLink}`
-        };
-
-        // Envoyer l'e-mail de confirmation
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-                res.status(500).send('Une erreur s\'est produite lors de l\'envoi de l\'e-mail de confirmation');
-            } else {
-                console.log('Email sent: ' + info.response);
-                res.status(201).send('Un e-mail de confirmation a été envoyé à ' + req.body.email);
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};*/
 
 
 const logout = (req, res) => {
@@ -202,18 +136,7 @@ const sendMail = async (req,res,next, account,type, token, resetconfirmationToke
                               `Si vous n'avez pas demandé cela, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.\n`
                     };
                     break;
-            /*case 'reset-password':
-                mailOptions = {
-                    from: 'mnrbaali@gmail.com',
-                    to: account.email,
-                    subject: 'Réinitialisation du mot de passe',
-                    text: `Vous recevez ceci parce que vous (ou quelqu'un d'autre) avez demandé la réinitialisation du mot de passe de votre compte.\n\n` +
-                          `Veuillez cliquer sur le lien suivant, ou copiez et collez-le dans votre navigateur pour terminer le processus :\n\n` +
-                          `http://localhost:3000/reset/${account.confirmationToken}\n\n` +
-                          `Si vous n'avez pas demandé cela, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.\n`
-                };
-                break;*/
-            // Ajoutez autant de cas que vous le souhaitez...
+           
         }
 
         // Envoyer l'e-mail
@@ -232,50 +155,7 @@ const sendMail = async (req,res,next, account,type, token, resetconfirmationToke
    
    
 
-   
-    /* try {
-        let mailOptions = {
-            from: 'mnrbaali@gmail.com',
-            to: account.email,
-            subject: 'Confirmation d\'inscription',
-            text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
-        };
-
-        // Envoyer l'e-mail de confirmation
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                throw new Error('Erreur d\'envoi de mail');
-            } else {
-                console.log('Email sent: ' + info.response);
-                res.status(201).send('Un e-mail de confirmation a été envoyé à ' + account.email);
-            }
-        });
-    } catch (error) {
-        next(error); // Passez l'erreur au prochain middleware
-    }
-};*/
-
-/*const sendMail = async (account, res) =>{
-    let mailOptions = {
-        from: 'mnrbaali@gmail.com',
-        to: account.email,
-        subject: 'Confirmation d\'inscription',
-        text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
-    };
-
-    // Envoyer l'e-mail de confirmation
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-            res.status(500).send('Une erreur s\'est produite lors de l\'envoi de l\'e-mail de confirmation');
-        } else {
-            console.log('Email sent: ' + info.response);
-            res.status(201).send('Un e-mail de confirmation a été envoyé à ' + account.email);
-        }
-    });
-}
-*/
-
+  
 
 
 module.exports = {

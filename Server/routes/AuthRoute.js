@@ -2,53 +2,23 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-var session = require('express-session')
+//var session = require('express-session')
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/authMiddleware');
+//const auth = require('../middleware/authMiddleware');
 const limiter = require('../middleware/limitationTaux');
 const authController= require('../controllers/AuthController');
 const {sendMail, login, register, logout, resetPassword} = require('../controllers/AuthController')
 //const sendMail } = require('../controllers/AuthController');
 const { Account, accountValidationSchema } = require('../models/accountModel');
-/*var session = require('express-session');
-const app = express();
-app.use(session({
-    secret: 'your_secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-  }));*/
 
-/*router.get('/login', auth, (req, res) => {
-    res.send(req.user);
-});*/
 
 router.post('/login',limiter, login);
 router.post('/register',limiter, register);
 router.post('/logout', logout);
-// Route pour gérer le lien de confirmation d'e-mail
-/*router.get('/register/:token', async (req, res) => {
-    try {
-        const account = await Account.findOne({ confirmationToken: req.params.token });
-        console.log(account);
-        if (account) {
 
-            account.confirmed = true;
-           // account.confirmationToken = undefined;
-            await account.save();
-    
-            return res.send('Votre adresse e-mail a été confirmée avec succès');
-            
-        }
 
-        return res.status(400).send('Le lien de confirmation est invalide');
-    } catch (error) {
-        res.status(500).send('Une erreur s\'est produite lors de la confirmation de votre adresse e-mail');
-    }
-});*/
-
-// Route de confirmation
+// Route de confirmation de mail
 router.get('/register/:token',limiter, async (req, res, next) => {
     try {
         // Vérifier si le token correspond à celui dans la session
@@ -74,15 +44,9 @@ router.get('/register/:token',limiter, async (req, res, next) => {
         next(error); // Passez l'erreur au prochain middleware
     }
 });
-/*
-        return res.status(400).send('Le lien de confirmation est invalide');
-    } catch (error) {
-        res.status(500).send('Une erreur s\'est produite lors de la confirmation de votre adresse e-mail : ' + error.message);
-    }
-});*/
 
 
-// Ajoutez cette route dans votre fichier authRoute
+// route de renvoie du mail de confirmation
 router.get('/resend-confirmation',limiter, async (req, res, next) => {
     try {
         // Vérifiez si le compte existe dans la session
@@ -97,15 +61,9 @@ router.get('/resend-confirmation',limiter, async (req, res, next) => {
     } catch (error) {
         next(error); // Passez l'erreur au prochain middleware
     }
-});/*{
+});
 
-            
-            return res.status(400).send('Aucun compte trouvé dans la session');
-        }
-    } catch (error) {
-        res.status(500).send('Une erreur s\'est produite lors de la réexpédition de l\'e-mail de confirmation : ' + error.message);
-    }
-});*/
+// route d'envoie du mail au cas d'un mot de passe oublié
 
 router.post('/forgot-password', limiter, async (req, res, next) => {
     try {
