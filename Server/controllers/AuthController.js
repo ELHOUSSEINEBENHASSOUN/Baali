@@ -36,14 +36,14 @@ let transporter = nodemailer.createTransport({
 });
 
 //fonction login
-exports.login = async (req, res, next) => {
+const login = async (req, res, next) => {
     try {
         const user = await Account.findOne({ email: req.body.email});
         if (user && await bcrypt.compare(req.body.password, user.password)) {
             // Utilisateur authentifié avec succès
             // Générer un token JWT et l'envoyer à l'utilisateur
 
-            const token = jwt.sign({ id: user._id }, 'JWT_SECRET', { expiresIn: '1h' });
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
             // Envoyer le token à l'utilisateur
             res.status(200).json({ token: token });
@@ -54,8 +54,54 @@ exports.login = async (req, res, next) => {
         next(error); // Passez l'erreur au prochain middleware
     }
 };
+// Fonction d'enregistrement
+const register = async (req, res , next) => {
+    console.log('dkhal l register function')
+    try {
+        // Validate the data
+        const { error } = accountValidationSchema.validate(req.body);
+        if (error) return res.status(400).json({ error: error.details[0].message });
 
-/*exports.login = async (req, res) => {
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        // Générer un jeton unique pour l'utilisateur
+        let token = crypto.randomBytes(64).toString('hex');
+        let resetconfirmationTokenExpires = Date.now() + 3600000; // 1 heure
+        // Créer l'objet compte
+        const account = {
+            ...req.body,
+            password: hashedPassword,
+            confirmationToken: token,
+            resetPasswordExpires :resetconfirmationTokenExpires
+        };
+        console.log('Account obj created')
+        const utilisateur = jwt.sign(account, process.env.JWT_SECRET);
+        // Stocker le token de confirmation dans la session
+        req.session.account = utilisateur;
+        req.session.confirmationToken = token;
+         console.log(req.session.confirmationToken);
+        // Envoyer l'e-mail de confirmation
+        const responseMail = await sendMail(req,res,next, account,'confirmation');
+    } catch (error) {
+        // Supprimer le token de confirmation de la session en cas d'erreur
+        delete req.session.confirmationToken;
+        next(error); // Passez l'erreur au prochain middleware
+        //res.status(500).json({ error: error.message });
+    }
+};
+
+
+// Votre fonction CRUD pour réinitialiser le mot de passe
+const resetPassword = async (userId, newPassword) => {
+    // Hash le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Mettez à jour le mot de passe de l'utilisateur et supprimez le token de réinitialisation du mot de passe
+    await Account.updateOne({ _id: userId }, { password: hashedPassword, resetPasswordToken: undefined, resetPasswordExpires: undefined });
+};
+
+/*const login = async (req, res) => {
     const user = await Account.findOne({ email: req.body.email});
     if (user && await bcrypt.compare(req.body.password, user.password)) {
         // Utilisateur authentifié avec succès
@@ -70,7 +116,7 @@ exports.login = async (req, res, next) => {
     }
 };
 */
-/*exports.register = async (req, res) => {
+/*const register = async (req, res) => {
     try {
         // Validate the data
         const { error } = accountValidationSchema.validate(req.body);
@@ -118,7 +164,7 @@ exports.login = async (req, res, next) => {
 };*/
 
 
-exports.logout = (req, res) => {
+const logout = (req, res) => {
     // Supprimer le cookie
     res.clearCookie('token');
 
@@ -128,8 +174,8 @@ exports.logout = (req, res) => {
 
 // Fonction d'envoi de mail
 
-exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res, next) => {
-   
+const sendMail = async (req,res,next, account,type, token, resetconfirmationTokenExpires) => {
+    console.log('dkhal l sendMail function')
     try {
         let mailOptions;
 
@@ -141,6 +187,7 @@ exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res
                     subject: 'Confirmation d\'inscription',
                     text: `Merci de vous être inscrit ! Veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant : http://localhost:3000/api/v1/auth/register/${account.confirmationToken}`
                 };
+                console.log('end send mail function')
                 break;
 
                 case 'reset-password':
@@ -184,20 +231,7 @@ exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res
 };
    
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
    
     /* try {
         let mailOptions = {
@@ -221,7 +255,7 @@ exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res
     }
 };*/
 
-/*exports.sendMail = async (account, res) =>{
+/*const sendMail = async (account, res) =>{
     let mailOptions = {
         from: 'mnrbaali@gmail.com',
         to: account.email,
@@ -244,57 +278,10 @@ exports.sendMail = async (account,type, token, resetconfirmationTokenExpires,res
 
 
 
-
-
-
-
-
-
-// Fonction d'enregistrement
-exports.register = async (req, res , next) => {
-    try {
-        // Validate the data
-        const { error } = accountValidationSchema.validate(req.body);
-        if (error) return res.status(400).json({ error: error.details[0].message });
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-        // Générer un jeton unique pour l'utilisateur
-        let token = crypto.randomBytes(64).toString('hex');
-        let resetconfirmationTokenExpires = Date.now() + 3600000; // 1 heure
-        // Créer l'objet compte
-        const account = {
-            ...req.body,
-            password: hashedPassword,
-            confirmationToken: token,
-            resetPasswordExpires :resetconfirmationTokenExpires
-        };
-        const utilisateur = jwt.sign(account, 'JWT_SECRETt');
-        // Stocker le token de confirmation dans la session
-        req.session.account = utilisateur;
-        req.session.confirmationToken = token;
-         console.log(req.session.confirmationToken);
-        // Envoyer l'e-mail de confirmation
-        await exports.sendMail(account,'confirmation', res);
-    } catch (error) {
-        // Supprimer le token de confirmation de la session en cas d'erreur
-        delete req.session.confirmationToken;
-        next(error); // Passez l'erreur au prochain middleware
-        //res.status(500).json({ error: error.message });
-    }
+module.exports = {
+    sendMail,
+    login,
+    logout,
+    register,
+    resetPassword
 };
-
-
-// Votre fonction CRUD pour réinitialiser le mot de passe
-exports.resetPassword = async (userId, newPassword) => {
-    // Hash le nouveau mot de passe
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Mettez à jour le mot de passe de l'utilisateur et supprimez le token de réinitialisation du mot de passe
-    await Account.updateOne({ _id: userId }, { password: hashedPassword, resetPasswordToken: undefined, resetPasswordExpires: undefined });
-};
-
-/*module.exports = {
-    sendMail: sendMail
-};*/

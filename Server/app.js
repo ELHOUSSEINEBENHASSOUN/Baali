@@ -53,7 +53,6 @@ app.use((err, req, res, next) => {
       case 'Erreur d\'authentification':
           res.status(401).send('Nom d\'utilisateur ou mot de passe incorrect//');
           break;
-
       case 'Le lien de confirmation est invalide':
             res.status(400).send('Le lien de confirmation est invalide');
             break;

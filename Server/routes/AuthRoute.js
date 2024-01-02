@@ -8,6 +8,7 @@ const router = express.Router();
 const auth = require('../middleware/authMiddleware');
 const limiter = require('../middleware/limitationTaux');
 const authController= require('../controllers/AuthController');
+const {sendMail, login, register, logout, resetPassword} = require('../controllers/AuthController')
 //const sendMail } = require('../controllers/AuthController');
 const { Account, accountValidationSchema } = require('../models/accountModel');
 /*var session = require('express-session');
@@ -23,9 +24,9 @@ app.use(session({
     res.send(req.user);
 });*/
 
-router.post('/login',limiter,authController.login);
-router.post('/register',limiter,authController.register);
-router.post('/logout',authController.logout);
+router.post('/login',limiter, login);
+router.post('/register',limiter, register);
+router.post('/logout', logout);
 // Route pour gérer le lien de confirmation d'e-mail
 /*router.get('/register/:token', async (req, res) => {
     try {
@@ -57,7 +58,7 @@ router.get('/register/:token',limiter, async (req, res, next) => {
         if (req.session.confirmationToken && req.params.token === req.session.confirmationToken) {
 
              // Déchiffrer le JWT pour obtenir les informations du compte
-             const accountModel = jwt.verify(req.session.account, 'JWT_SECRETt');
+             const accountModel = jwt.verify(req.session.account, process.env.JWT_SECRET);
             // Créer le compte dans la base de données
             const account = new Account(accountModel);
             await account.save();
@@ -87,9 +88,9 @@ router.get('/resend-confirmation',limiter, async (req, res, next) => {
         // Vérifiez si le compte existe dans la session
         if (req.session && req.session.account) {
 
-            const accountModel = jwt.verify(req.session.account, 'JWT_SECRETt');
+            const accountModel = jwt.verify(req.session.account, process.env.JWT_SECRET);
             // Renvoyer l'e-mail de confirmation
-            await authController.sendMail(accountModel,'confirmation', res);
+            await sendMail(req,res,next,accountModel,'confirmation');
         } else  {
             throw new Error('Aucun compte trouvé dans la session');
         }
@@ -116,7 +117,7 @@ router.post('/forgot-password', limiter, async (req, res, next) => {
             let resetconfirmationTokenExpires = Date.now() + 3600000; // 1 heure
             req.session.resetToken = token;
             req.session.resetconfirmationTokenExpire =resetconfirmationTokenExpires;
-            await authController.sendMail(accountModel, 'reset-password',token, resetconfirmationTokenExpires);
+            await sendMail(req,res,next, accountModel, 'reset-password',token, resetconfirmationTokenExpires);
         res.status(200).send('Un e-mail a été envoyé à ' + accountModel.email + ' avec des instructions supplémentaires.');
         }else {
 
@@ -155,7 +156,7 @@ router.post('/forgot-password', limiter, async (req, res, next) => {
         }
 
         // Réinitialisez le mot de passe de l'utilisateur
-        await authController.resetPassword(user._id, req.body.password);
+        await resetPassword(user._id, req.body.password);
 
         res.send('Votre mot de passe a été réinitialisé avec succès');
     } catch (error) {
