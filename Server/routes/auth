@@ -1,0 +1,12 @@
+var passport = require('../controllers/auth2Controller');
+
+const express = require('express');
+
+const router = express.Router();
+
+router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+
+router.get('/google/callback', passport.authenticate('google', { successRedirect: '/', failureRedirect: '/google' }));
+
+
+module.exports = router;

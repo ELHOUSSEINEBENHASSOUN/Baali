@@ -18,6 +18,6 @@ router.get('/getAcc/:id',auth,isAdmin, getAccountById);
 router.delete('/delAcc/:id',auth,isAdmin, deleteAccountById);
 router.delete('/delAllAcc', auth,isAdmin, deleteAllAccounts);
 
-router.put('/updateAcc/:id',auth,isAdmin, updateAccountById);
+router.put('/updateAcc/:id',auth, updateAccountById);
 
 module.exports = router;

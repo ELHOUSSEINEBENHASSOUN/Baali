@@ -1,25 +1,28 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const Joi = require('joi');
+const findOrCreate = require('mongoose-findorcreate');
 
 
 
 // 1- Définition du schéma
 const AccountSchema = new mongoose.Schema({
 
-    // _id: { type: String, default: () => crypto.randomUUID() },
 
-    fullname: { type: String, required: true, trim: true },
+    email: { type: String, required: false, unique: false, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+    /*// _id: { type: String, default: () => crypto.randomUUID() },
 
-    email: { type: String, required: true, unique: true, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+    fullname: { type: String, required: false, trim: true },
 
-    password: { type: String, required: true },
+    email: { type: String, required: false, unique: true, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
 
-    phoneNumber: { type: String, required: true, trim: true },
+    password: { type: String, required: false },
 
-    address: { type: Array, required: true },
+    phoneNumber: { type: String, required: false, trim: true },
 
-    isAdmin: { type: Boolean, required: true },
+    address: { type: Array, required: false },
+
+    isAdmin: { type: Boolean, required: false },
 
     createdAt: { type: Date, default: Date.now },
 
@@ -31,20 +34,51 @@ const AccountSchema = new mongoose.Schema({
 
     confirmationToken : {type: String},
 
-    confirmed : {type:Boolean , default: false},
+    confirmed : {type:Boolean , default: false},*/
 
-    resetPasswordExpires: { type: Date, default: null }
+    provider: {
+        type: String,
+        required: true
+    },
+    id: {
+        type: String,
+        required: true
+    },
+    displayName: {
+        type: String,
+        required: true
+    },
+    name: {
+        familyName: String,
+        givenName: String,
+        middleName: String
+    },
+    emails: [
+        {  
+            value: String,
+            default:"mounir@mounir.mounir",
+            type: String
+        }
+    ],
+    photos: [
+        {
+            value: String
+        }
+    ],
+
+
+    //resetPasswordExpires: { type: Date, default: null }
 
 }, { versionKey: false });
 
 // 2- Définition du schéma de validation avec Joi
 const accountValidationSchema = Joi.object({
-    fullname: Joi.string().required(),
-    email: Joi.string().required(),
-    password: Joi.string().required(),
-    address: Joi.array().items(Joi.string()).required(),
-    phoneNumber: Joi.string().required(),
-    isAdmin: Joi.boolean().required(),
+    fullname: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string(),
+    address: Joi.array().items(Joi.string()),
+    phoneNumber: Joi.string(),
+    isAdmin: Joi.boolean(),
     createdAt: Joi.date().iso().max('now'),
     lastLogin: Joi.date().allow(null),
     wishlist: Joi.array().items(Joi.string()),
@@ -52,7 +86,7 @@ const accountValidationSchema = Joi.object({
     resetPasswordExpires: Joi.date().iso().max('now').allow(null),
 });
 
-
+AccountSchema.plugin(findOrCreate);
 // 3- Définition du modèle de account
 const Account = mongoose.model('Account', AccountSchema);
 

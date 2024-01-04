@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const dotenv = require('dotenv');
 require('./config/database');
 var session = require('express-session')
-
+const passport = require("passport");
 
 
 
@@ -20,6 +20,9 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
   }));
+  app.use(passport.initialize());
+  app.use(passport.session());
+
 
 // Middlewares de ExpressJS
 app.use(express.urlencoded({ extended: true })); // send data with Form URLencoded
@@ -38,6 +41,7 @@ app.use('/api/v1/category', require('./routes/categoryRoute'));
 app.use('/api/v1/offer', require('./routes/offerRoute'));
 app.use('/api/v1/notification', require('./routes/notificationRoute'));
 app.use('/api/v1/auth', require('./routes/AuthRoute'));
+app.use('/api/v2/auth', require('./routes/auth'));
 
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log l'erreur dans la console
