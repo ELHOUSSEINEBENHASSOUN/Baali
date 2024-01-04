@@ -1,102 +1,104 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const Joi = require('joi');
+const findOrCreate = require('mongoose-findorcreate');
+const { strict } = require('assert');
 
+
+
+// 1- Définition du schéma
 const AccountSchema = new mongoose.Schema({
 
-    _id: {
-        type: String,
-        default: () => crypto.randomUUID(),
-    },
 
+    email: { type: String, required: false, unique: false, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+    // _id: { type: String, default: () => crypto.randomUUID() },
 
-    fullname: {
+    fullname: { type: String, required: false, trim: true },
+
+    email: { type: String, required: false, unique: true, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
+
+    password: { type: String, required: false },
+
+    phoneNumber: { type: String, required: false, trim: true },
+
+    address: { type: Array, required: false },
+
+    isAdmin: { type: Boolean, required: false },
+
+    createdAt: { type: Date, default: Date.now },
+
+    lastLogin: { type: Date, default: null },
+
+    wishlist: { type: Array, required: false },
+
+    resetPasswordToken: { type: String, default: null },
+
+    confirmationToken : {type: String},
+
+    confirmed : {type:Boolean , default: false},
+    
+    
+    accessToken : {type: String},
+    refreshToken :{type: String},
+
+    googleId :{ type: String, required: false, trim: true },
+
+    /*provider: {
         type: String,
         required: true
     },
-
-
-    email: {
+    id: {
         type: String,
-        required: true,
-        unique: true,
-        validate: {
-            validator: function (value) {
-                // Use a regular expression for basic email validation
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-            },
-            message: 'Invalid email address'
+        required: true
+    },
+    displayName: {
+        type: String,
+        required: true
+    },
+    name: {
+        familyName: String,
+        givenName: String,
+        middleName: String
+    },
+    emails: [
+        {  
+            value: String,
+            //default:"mounir@mounir.mounir",
+            type: String
         }
-    },
-
-
-    password: {
-        type: String,
-        required: true
-    },
-
-    phoneNumber: {
-        type: String,
-        required: true
-    },
-
-
-    //address: { type: Array, required: false },
-    address: [{
-        street: {
-            type: String,
-            required: true
-        },
-        city: {
-            type: String,
-            required: true
-        },
-        state: {
-            type: String,
-            required: true
-        },
-        postalCode: {
-            type: String,
-            required: true
+    ],
+    photos: [
+        {
+            value: String
         }
-    }],
+    ],*/
 
 
-    isAdmin: {
-        type: Boolean,
-        required: true
-    },
+    resetPasswordExpires: { type: Date, default: null }
 
+}, { versionKey: false });
 
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
+// 2- Définition du schéma de validation avec Joi
+const accountValidationSchema = Joi.object({
+    fullname: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string(),
+    address: Joi.array().items(Joi.string()),
+    phoneNumber: Joi.string(),
+    isAdmin: Joi.boolean(),
+    createdAt: Joi.date().iso().max('now'),
+    lastLogin: Joi.date().allow(null),
+    wishlist: Joi.array().items(Joi.string()),
+    resetPasswordToken: Joi.string().allow(null),
+    resetPasswordExpires: Joi.date().iso().max('now').allow(null),
+});
 
-
-    lastLogin: {
-        type: Date,
-        default: null
-    },
-
-
-    wishlist: {
-        type: Array,
-        required: false
-    },
-
-
-    resetPasswordToken: {
-        type: String,
-        required: false
-    },
-
-
-    resetPasswordExpires: {
-        type: Date,
-        required: false
-    }
-
-})
-
+AccountSchema.plugin(findOrCreate);
+// 3- Définition du modèle de account
 const Account = mongoose.model('Account', AccountSchema);
-module.exports = Account;
+
+// 4- Exportation du modèle de account et du schéma de validation
+module.exports = {
+    Account,
+    accountValidationSchema
+};
