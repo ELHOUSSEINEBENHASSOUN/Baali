@@ -16,12 +16,9 @@ let transporter = nodemailer.createTransport({
     auth: {
        
         //type: "OAuth2",
-        user: "mnrbaali@gmail.com",
-        pass: "oxnxehselbsmwabu",
-       /* clientId: '695313908186-5dalohai3j8ij6atbqgbkuo6as6n67u3.apps.googleusercontent.com',
-        clientSecret: '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',
-        /*refreshToken: 'votreRefreshToken'*/
-        /*accessToken:"AIzaSyBIsgFMUnpCie7D3hROXuEQNdGRb4jZE4s"*/
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+       
     }
 
 });
@@ -74,7 +71,7 @@ const register = async (req, res , next) => {
         // Stocker le token de confirmation dans la session
         req.session.account = utilisateur;
         req.session.confirmationToken = token;
-         console.log(req.session.confirmationToken);
+        // console.log(req.session.confirmationToken);
         // Envoyer l'e-mail de confirmation
         const responseMail = await sendMail(req,res,next, account,'confirmation');
     } catch (error) {

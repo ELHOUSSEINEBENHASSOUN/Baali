@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const Joi = require('joi');
 const findOrCreate = require('mongoose-findorcreate');
+const { strict } = require('assert');
 
 
 
@@ -10,7 +11,7 @@ const AccountSchema = new mongoose.Schema({
 
 
     email: { type: String, required: false, unique: false, trim: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-    /*// _id: { type: String, default: () => crypto.randomUUID() },
+    // _id: { type: String, default: () => crypto.randomUUID() },
 
     fullname: { type: String, required: false, trim: true },
 
@@ -34,9 +35,15 @@ const AccountSchema = new mongoose.Schema({
 
     confirmationToken : {type: String},
 
-    confirmed : {type:Boolean , default: false},*/
+    confirmed : {type:Boolean , default: false},
+    
+    
+    accessToken : {type: String},
+    refreshToken :{type: String},
 
-    provider: {
+    googleId :{ type: String, required: false, trim: true },
+
+    /*provider: {
         type: String,
         required: true
     },
@@ -56,7 +63,7 @@ const AccountSchema = new mongoose.Schema({
     emails: [
         {  
             value: String,
-            default:"mounir@mounir.mounir",
+            //default:"mounir@mounir.mounir",
             type: String
         }
     ],
@@ -64,10 +71,10 @@ const AccountSchema = new mongoose.Schema({
         {
             value: String
         }
-    ],
+    ],*/
 
 
-    //resetPasswordExpires: { type: Date, default: null }
+    resetPasswordExpires: { type: Date, default: null }
 
 }, { versionKey: false });
 
