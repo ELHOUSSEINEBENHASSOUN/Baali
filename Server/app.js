@@ -1,6 +1,7 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const session =require('express-session');
 const morgan = require('morgan');
-const joi = require('joi');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 require('./config/database');
@@ -20,7 +21,14 @@ app.use(express.json()); // send data with JSON
 // app.use(express.static('public')); // Access to the file static
 app.use(helmet()); // To Secure requestes HTTP
 app.use(morgan('tiny')); // Status of the requestes HTTP and 'tiny' responsable for format msg
-
+app.use(session({
+    secret:'secret',
+    resave: false,
+    saveUninitialized: true,
+}));
+app.use(bodyParser.json()); // Middleware de body parsing pour les données JSON
+// Middleware de body parsing pour les données de formulaire
+app.use(bodyParser.urlencoded({ extended: false }));
 
 //Routes
 app.use('/api/v1/account', require('./routes/accountRoute'));

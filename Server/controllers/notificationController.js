@@ -11,7 +11,7 @@ const createNotification = async (req, res) => {
         //enregistrer la notif
         const notification = new Notification(req.body);
         await notification.save();
-        res.status(201).send(notification);
+        res.status(201).json({ message: 'Notification created successfully!' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -83,7 +83,7 @@ const updateNotificationById = async (req, res) => {
         if (!upNotification) {
             return res.status(404).json({ error: 'notification not found' });
         }
-        res.status(200).send(upNotification);
+        res.status(200).json({ message: 'Notification created successfully!' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

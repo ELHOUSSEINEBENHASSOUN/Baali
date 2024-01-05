@@ -1,18 +1,21 @@
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
 
 const generateToken = account => {
-    const payload = {
+    try {
+        const payload = {
         id: account.id,
         fullname: account.fullname,
         email: account.email,
         role: account.role
     };
-
     return jwt.sign(payload, secretKey, { expiresIn: '1h' });
+    }catch (error) {
+        console.log("Error in generating token", error);
+        throw new Error ('Error in generating token ');
+    }
 };
 
 const verifyToken = token => {
